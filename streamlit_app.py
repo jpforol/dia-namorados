@@ -1,10 +1,8 @@
 import streamlit as st
-import time
-import base64
+from streamlit_autorefresh import st_autorefresh
 
 st.set_page_config(page_title="Feliz Dia dos Namorados 💖", layout="centered")
 
-# Estilo da página
 st.markdown(
     """
     <style>
@@ -26,6 +24,12 @@ st.markdown(
     h1, h2, h3, h4 {
         color: #FFD6E8;
     }
+    img.responsive {
+        max-width: 90vw;
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 0px 4px 20px rgba(0,0,0,0.3);
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -37,33 +41,28 @@ foto1 = st.secrets["images"]["foto1"]
 foto2 = st.secrets["images"]["foto2"]
 foto3 = st.secrets["images"]["foto3"]
 
-# Lista de imagens e legendas
 images = [
     (foto1, "Juntos em todos os momentos ❤️"),
     (foto2, "Um dia tranquilo, do jeito que a gente gosta 💑"),
     (foto3, "Só nós dois e o resto do mundo lá fora ❤️"),
 ]
 
-# Controla o índice da imagem
-if "index" not in st.session_state:
-    st.session_state.index = 0
+count = st_autorefresh(interval=5000, limit=None, key="auto_refresh")
 
-# Pega imagem atual e legenda
-img_base64, caption = images[st.session_state.index]
+index = count % len(images)
 
-# Exibe imagem com tamanho fixo centralizado via HTML
+img_base64, caption = images[index]
+
 st.markdown(
     f"""
     <div style="display: flex; justify-content: center;">
-        <img src="data:image/jpeg;base64,{img_base64}" 
-             style="width: 650px; height: 850px; object-fit: cover; border-radius: 15px; box-shadow: 0px 4px 20px rgba(0,0,0,0.3);" />
+        <img class="responsive" src="data:image/jpeg;base64,{img_base64}" />
     </div>
     <div class='caption'>{caption}</div>
     """,
     unsafe_allow_html=True,
 )
 
-# Mensagem final
 st.markdown(
     """
     <div style="text-align: center; margin-top: 40px; font-size: 18px; color: #E0BCCF;">
@@ -78,9 +77,3 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-
-# Espera e troca
-time.sleep(5)
-st.session_state.index = (st.session_state.index + 1) % len(images)
-st.rerun()
